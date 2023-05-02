@@ -51,6 +51,7 @@ class CSPNeXt(BaseModule):
     """
     # From left to right:
     # in_channels, out_channels, num_blocks, add_identity, use_spp
+
     arch_settings = {
         'P5': [[64, 128, 3, True, False], [128, 256, 6, True, False],
                [256, 512, 6, True, False], [512, 1024, 3, False, True]],
@@ -126,8 +127,10 @@ class CSPNeXt(BaseModule):
                 act_cfg=act_cfg))
         self.layers = ['stem']
 
+
         for i, (in_channels, out_channels, num_blocks, add_identity,
                 use_spp) in enumerate(arch_setting):
+
             in_channels = int(in_channels * widen_factor)
             out_channels = int(out_channels * widen_factor)
             num_blocks = max(round(num_blocks * deepen_factor), 1)

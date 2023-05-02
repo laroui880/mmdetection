@@ -26,6 +26,8 @@ try:
 except ImportError:
     skimage = None
 
+@MODELS.register_module()
+
 
 @MODELS.register_module()
 class DetDataPreprocessor(ImgDataPreprocessor):

@@ -177,9 +177,11 @@ def load_json_logs(json_logs):
                 if not len(log) > 1:
                     continue
 
+                print('log_dict', log_dict)
+
                 if epoch not in log_dict:
                     log_dict[epoch] = defaultdict(list)
-
+                print('log ================= ', log[-1])
                 for k, v in log.items():
                     if '/' in k:
                         log_dict[epoch][k.split('/')[-1]].append(v)

@@ -12,7 +12,8 @@ from pycocotools.cocoeval import COCOeval
 
 def makeplot(rs, ps, outDir, class_name, iou_type):
     cs = np.vstack([
-        np.ones((2, 3)),
+        np.ones((1, 3)),
+        np.zeros((1, 3)),
         np.array([0.31, 0.51, 0.74]),
         np.array([0.75, 0.31, 0.30]),
         np.array([0.36, 0.90, 0.38]),
@@ -123,7 +124,7 @@ def get_gt_area_group_numbers(cocoEval):
 def make_gt_area_group_numbers_plot(cocoEval, outDir, verbose=True):
     areaRngLbl2Number = get_gt_area_group_numbers(cocoEval)
     areaRngLbl = areaRngLbl2Number.keys()
-    if verbose:
+    if True:#verbose:
         print('number of annotations per area group:', areaRngLbl2Number)
 
     # Init figure
@@ -298,7 +299,7 @@ def analyze_results(res_file,
                 makebarplot(recThrs, ps[:, :, k], res_out_dir, nm['name'],
                             iou_type)
         makeplot(recThrs, ps, res_out_dir, 'allclass', iou_type)
-        if extraplots:
+        if True: #extraplots:
             makebarplot(recThrs, ps, res_out_dir, 'allclass', iou_type)
             make_gt_area_group_numbers_plot(
                 cocoEval=cocoEval, outDir=res_out_dir, verbose=True)

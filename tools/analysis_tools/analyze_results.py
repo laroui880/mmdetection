@@ -19,6 +19,8 @@ from mmdet.structures import DetDataSample
 from mmdet.utils import replace_cfg_vals, update_data_root
 from mmdet.visualization import DetLocalVisualizer
 
+from matplotlib import pyplot as plt
+
 
 def bbox_map_eval(det_result, annotation, nproc=4):
     """Evaluate mAP of single image det result.
@@ -113,6 +115,7 @@ class ResultVisualizer:
 
         for performance_info in performances:
             index, performance = performance_info
+
             data_info = dataset[index]
             data_info['gt_instances'] = data_info['instances']
 
@@ -121,11 +124,12 @@ class ResultVisualizer:
             fname, name = osp.splitext(osp.basename(filename))
             save_filename = fname + '_' + str(round(performance, 3)) + name
             out_file = osp.join(out_dir, save_filename)
-
+            
             if task == 'det':
                 gt_instances = InstanceData()
-                gt_instances.bboxes = results[index]['gt_instances']['bboxes']
-                gt_instances.labels = results[index]['gt_instances']['labels']
+                if 'gt_instances' in results[index].keys():
+                    gt_instances.bboxes = results[index]['gt_instances']['bboxes']
+                    gt_instances.labels = results[index]['gt_instances']['labels']
 
                 pred_instances = InstanceData()
                 pred_instances.bboxes = results[index]['pred_instances'][
@@ -234,6 +238,7 @@ class ResultVisualizer:
         prog_bar = ProgressBar(len(results))
         _mAPs = {}
         data_info = {}
+        
         for i, (result, ) in enumerate(zip(results)):
 
             # self.dataset[i] should not call directly
@@ -257,6 +262,20 @@ class ResultVisualizer:
 
             _mAPs[i] = mAP
             prog_bar.update()
+
+        print('For score_threshold =', self.score_thr)
+        print('mAP mean score on all test set =', np.array(list(_mAPs.values())).mean())
+        print('mAP median score on all test set =', np.median(np.array(list(_mAPs.values()))))
+        print('mAP std score on all test set =', np.std(np.array(list(_mAPs.values()))))
+
+
+        plt.hist(np.array(list(_mAPs.values())), density=True)#, bins=30)  # density=False would make counts
+        plt.ylabel('Probability')
+        plt.xlabel('mAP on test dataset')
+        plt.savefig('mAP_distribution.png')
+
+
+
         # descending select topk image
         _mAPs = list(sorted(_mAPs.items(), key=lambda kv: kv[1]))
         good_mAPs = _mAPs[-topk:]
