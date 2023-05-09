@@ -1,13 +1,11 @@
 _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_1x.py',
-    '../_base_/datasets/person_NII_CU_RGBIR_detection.py', './rtmdet_tta.py'
+    '../_base_/datasets/dota-ship_detection.py', './rtmdet_tta.py'
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb32-mcrop-2-6-coslr-1000e_nii_cu_rgbir-224-96/epoch_1000.pth"
-ssl_method = 'swav_NII_CU_RGBIR'
-
+checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_dota-ship/.pth"
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -44,10 +42,9 @@ loss_cls_weight = 1.0
 loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.65
-
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_person_NII_CU_RGB-IR/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU"
+work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/test_dota-ship/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_ship_detection"
 
 #=============================================
 model = dict(
@@ -116,47 +113,47 @@ model = dict(
 )
 
 train_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    #dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
-    # dict(
-    #     type='RandomResize',
-    #     scale=(img_scale[0] * 2, img_scale[1] * 2),
-    #     ratio_range=random_resize_ratio_range,
-    #     keep_ratio=True),
-    # dict(type='RandomCrop', crop_size=img_scale),
-    # dict(type='YOLOXHSVRandomAug'),
-    # dict(type='RandomFlip', prob=0.5),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
-    # dict(
-    #     type='CachedMixUp',
-    #     img_scale=img_scale,
-    #     ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
-    #     max_cached_images=mixup_max_cached_images,
-    #     pad_val=(114, 114, 114, 114)),
+    dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
+    dict(
+        type='RandomResize',
+        scale=(img_scale[0] * 2, img_scale[1] * 2),
+        ratio_range=random_resize_ratio_range,
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=img_scale),
+    dict(type='YOLOXHSVRandomAug'),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
+    dict(
+        type='CachedMixUp',
+        img_scale=img_scale,
+        ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
+        max_cached_images=mixup_max_cached_images,
+        pad_val=(114, 114, 114)),
     dict(type='PackDetInputs')
 ]
 
 train_pipeline_stage2 = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    # dict(
-    #     type='RandomResize',
-    #     scale=img_scale,
-    #     ratio_range=random_resize_ratio_range,
-    #     keep_ratio=True),
-    # dict(type='RandomCrop', crop_size=img_scale),
-    # dict(type='YOLOXHSVRandomAug'),
-    # dict(type='RandomFlip', prob=0.5),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
+    dict(
+        type='RandomResize',
+        scale=img_scale,
+        ratio_range=random_resize_ratio_range,
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=img_scale),
+    dict(type='YOLOXHSVRandomAug'),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(type='PackDetInputs')
 ]
 
 test_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    #dict(type='Resize', scale=img_scale, keep_ratio=True),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
+    dict(type='Resize', scale=img_scale, keep_ratio=True),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(
         type='PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
@@ -242,3 +239,4 @@ visualizer = dict(
     vis_backends=vis_backends,
     name='visualizer')
 
+#    save_dir="/home/sarah.laroui/workspace/bfte/mmdetection/results/test",

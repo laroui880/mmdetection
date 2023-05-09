@@ -18,22 +18,22 @@ batch_size=4
 num_workers=4
 persistent_workers=True
 img_scale = (640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+mean = [100.363, 88.385, 77.99474]#, 118.16]
+std = [37.12337, 32.39224, 29.420309]#, 18.1]
 
 num_classes = 1  # Number of classes for classification
 classes = ["person"]
 
 # Pipelines
 train_pipeline = [
-    dict(type='LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline

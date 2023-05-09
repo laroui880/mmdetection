@@ -5,35 +5,35 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb0/train/coco/NII_CU.json'
-train_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_0/train/'  # Prefix of train image path
+train_ann_file = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/annotations/coco/DOTA-ship.json'
+train_data_prefix = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb0/val/coco/NII_CU.json'
-val_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_0/val/'  # Prefix of val image path
+val_ann_file = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/annotations/coco/DOTA-ship.json'
+val_data_prefix = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb0/val/coco/NII_CU.json'
-test_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_0/val/'  #'  # Prefix of test image path
+test_ann_file = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/annotations/coco/DOTA-ship.json'
+test_data_prefix = '/data/datasets_tmp/__hotdata__/detection/DOTA-ship/split_ss_dota_ship/trainval/images/'  #'  # Prefix of test image path
 
-batch_size=4
-num_workers=4
+batch_size=32
+num_workers=10
 persistent_workers=True
 img_scale = (640, 480)
-mean = [100.363, 88.385, 77.99474, 0]
-std = [37.12337, 32.39224, 29.420309, 1]
+mean = [100.363, 88.385, 77.99474]
+std = [37.12337, 32.39224, 29.420309]
 
 num_classes = 1  # Number of classes for classification
-classes = ["person"]
+classes = ["ship"]
 
 # Pipelines
 train_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
@@ -100,4 +100,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/rgb_0_person_detection')
+    outfile_prefix='results/ship_detection')
