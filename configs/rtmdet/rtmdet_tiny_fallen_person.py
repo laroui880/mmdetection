@@ -242,4 +242,3 @@ visualizer = dict(
     vis_backends=vis_backends,
     name='visualizer')
 
-#    

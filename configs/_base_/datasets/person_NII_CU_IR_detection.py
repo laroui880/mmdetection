@@ -14,7 +14,7 @@ val_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/
 test_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/val/coco/NII_CU_thermal.json'
 test_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/val/'  #'  # Prefix of test image path
 
-batch_size=32
+batch_size=8
 num_workers=10
 persistent_workers=True
 img_scale = (640, 480)

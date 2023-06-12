@@ -1,11 +1,13 @@
 _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_1x.py',
-    '../_base_/datasets/dota-ship_detection.py', './rtmdet_tta.py'
+    '../_base_/datasets/roboflow-ship_detection.py', './rtmdet_tta.py'
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
 
 checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_dota-ship/swav_masati_rtmdet_tiny_syncbn_fast_10xb32-1000e_ship_detection/best_coco/bbox_mAP_epoch_318.pth"
+ssl_method = 'swav_masati_and_finetuned_dota'
+
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -17,11 +19,11 @@ random_resize_ratio_range = (0.5, 2.0)
 # Number of cached images in mixup
 mixup_max_cached_images = 10
 # Batch size
-batch_size = _base_.batch_size
+batch_size = _base_.batch_size * 2
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 100
+max_epochs = 1000
 stage2_num_epochs = 20
 base_lr = 0.004
 interval = 10
@@ -42,9 +44,10 @@ loss_cls_weight = 1.0
 loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.65
+
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/test_dota-ship/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_ship_detection"
+work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_roboflow-ship/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_ship_detection"
 
 #=============================================
 model = dict(
@@ -54,7 +57,8 @@ model = dict(
         mean=mean,
         std=std,
         bgr_to_rgb=False,
-        batch_augments=None),
+        batch_augments=None,
+        pad_size_divisor=32), 
     backbone=dict(
         type='CSPNeXt',
         arch='P5',
@@ -239,4 +243,4 @@ visualizer = dict(
     vis_backends=vis_backends,
     name='visualizer')
 
-#    save_dir="/home/sarah.laroui/workspace/bfte/mmdetection/results/test",
+#    

@@ -5,35 +5,39 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/train/coco/NII_CU_rgbir.json'
-train_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/dataset/fallen-person-2classes/train/annotations/coco/_annotations.coco.json'
+train_data_prefix = '/hotdata/dataset/fallen-person-2classes/train/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/val/coco/NII_CU_rgbir.json'
-val_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/dataset/fallen-person-2classes/val/annotations/coco/_annotations.coco.json'
+val_data_prefix = '/hotdata/dataset/fallen-person-2classes/val/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/val/coco/NII_CU_rgbir.json'
-test_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  #'  # Prefix of test image path
+# test_ann_file = '/hotdata/dataset/fallen-person-2classes/test/annotations/coco/_annotations.coco.json'
+# test_data_prefix = '/hotdata/dataset/fallen-person-2classes/test/images/'  #'  # Prefix of test image path
 
-batch_size=4
-num_workers=4
+test_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/test.json'
+test_data_prefix = '/'
+
+batch_size=64
+num_workers=10
 persistent_workers=True
 img_scale = (640, 480)
-mean = [100.363, 88.385, 77.99474, 118.16]
-std = [37.12337, 32.39224, 29.420309, 18.1]
 
-num_classes = 1  # Number of classes for classification
-classes = ["person"]
+mean = [102.1580356, 108.77613449, 109.8842465 ]
+std = [31.33850836, 35.71624226, 38.54064124]
+
+num_classes = 2  # Number of classes for classification
+classes = ["Lying_Person", "Person"]
 
 # Pipelines
 train_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
@@ -100,4 +104,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/rgb_ir_person_detection')
+    outfile_prefix='results/person_detection')

@@ -23,7 +23,7 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 100
+max_epochs = 2
 stage2_num_epochs = 20
 base_lr = 0.004
 interval = 10
@@ -50,14 +50,16 @@ nms_iou = 0.65
 work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_person_NII_CU_RGB-IR/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU"
 
 #=============================================
+
+#  data_preprocessor=dict(
+#         type='DetDataPreprocessor',
+#         mean=mean,
+#         std=std,
+#         bgr_to_rgb=False,
+#         batch_augments=None),
+
 model = dict(
     type='RTMDet',
-    data_preprocessor=dict(
-        type='DetDataPreprocessor',
-        mean=mean,
-        std=std,
-        bgr_to_rgb=False,
-        batch_augments=None),
     backbone=dict(
         type='CSPNeXt',
         arch='P5',
@@ -118,6 +120,11 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        scale_factor=1.0,
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     #dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
     # dict(
     #     type='RandomResize',
@@ -126,8 +133,8 @@ train_pipeline = [
     #     keep_ratio=True),
     # dict(type='RandomCrop', crop_size=img_scale),
     # dict(type='YOLOXHSVRandomAug'),
-    # dict(type='RandomFlip', prob=0.5),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
     # dict(
     #     type='CachedMixUp',
     #     img_scale=img_scale,
@@ -140,6 +147,11 @@ train_pipeline = [
 train_pipeline_stage2 = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        scale_factor=1.0,
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     # dict(
     #     type='RandomResize',
     #     scale=img_scale,
@@ -147,15 +159,15 @@ train_pipeline_stage2 = [
     #     keep_ratio=True),
     # dict(type='RandomCrop', crop_size=img_scale),
     # dict(type='YOLOXHSVRandomAug'),
-    # dict(type='RandomFlip', prob=0.5),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
     dict(type='PackDetInputs')
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    #dict(type='Resize', scale=img_scale, keep_ratio=True),
+    dict(type='Resize', scale=img_scale, keep_ratio=True),
     # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(
         type='PackDetInputs',

@@ -5,10 +5,6 @@ _base_ = [
 # ==============Custom Variables==============
 # -----runtime related-----
 
-#checkpoint = "home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune/SSL_resisc45/swav_rtmdet_tiny_syncbn_fast_4xb64-100e_smoke-v2/epoch_100.pth"
-#checkpoint = "/hotdata/Sarah/bbox_mAP_epoch_996.pth"
-#checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune/SSL_flame/swav_flame_rtmdet_tiny_syncbn_fast_4xb32-1000e_smoke-v2/best_coco/bbox_mAP_epoch_999.pth"
-#checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_force06/swav_patternnet_smk_rtmdet_tiny_syncbn_fast_4xb32-100e_force06/best_coco/bbox_mAP_epoch_68.pth"
 checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_force06/SSL_mix_patternnet_wildfire_finetuneForce06_35imgs/best_coco/bbox_mAP_epoch_99.pth"
 
 env_cfg = dict(cudnn_benchmark=True)
