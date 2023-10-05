@@ -4,7 +4,9 @@ _base_ = [
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
-checkpoint = '/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_azuria-smoke-v2/ssl_patternnet_smk_frozen1_rtmdet_tiny_syncbn_fast_4xb4-3000e_smoke_detection/best_coco/bbox_mAP_epoch_620.pth'
+#checkpoint = '/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_azuria-smoke-v2/ssl_patternnet_smk_frozen1_rtmdet_tiny_syncbn_fast_4xb4-3000e_smoke_detection/best_coco/bbox_mAP_epoch_620.pth'
+checkpoint = '/hotdata/userdata/sarah.laroui/workspace/mmrazor/results/20230802_114014/model_ptq.pth'
+quantification = 'Af_q'  #'Bf_q'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -42,10 +44,11 @@ loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.6#5
 # -----save train data-----
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/test_azuria-smoke-v2/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke_detection"
-
+#work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/test_smoke/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke_detection"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmrazor/results/quantification_evaluation/test_smoke/{quantification}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke_detection"
 
 #=============================================
+
 model = dict(
     type='RTMDet',
     data_preprocessor=dict(
@@ -198,6 +201,9 @@ train_cfg = dict(
 # The config of evaluators consists of one or a list of metric configs:
 val_evaluator = dict(proposal_nums=(100, 1, 10)) # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.evaluation.metrics.CocoMetric 
 test_evaluator = val_evaluator
+
+test_evaluator['outfile_prefix']='/hotdata/userdata/sarah.laroui/workspace/mmrazor/results/quantification_evaluation/test_smoke/' + quantification + '_results/smoke-v2_detection'
+
 
 # optimizer
 optim_wrapper = dict(

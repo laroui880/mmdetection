@@ -5,14 +5,16 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/data/datasets_tmp/__hotdata__/detection/smoke_azuria/v2/annotations/coco-v2/train.json'
-train_data_prefix = '/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/smoke_azuria/v2/annotations/coco-v2/train.json'
+
+train_data_prefix = ''  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/data/datasets_tmp/__hotdata__/detection/smoke_azuria/v2/annotations/coco-v2/val.json'
-val_data_prefix = '/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/smoke_azuria/v2/annotations/coco-v2/val.json'
+val_data_prefix = ''  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/data/datasets_tmp/__hotdata__/detection/smoke_azuria/v2/annotations/coco-v2/test.json'
-test_data_prefix = '/'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/smoke_azuria/v2/annotations/coco-v2/test.json'
+test_data_prefix = ''  # Prefix of test image path
+
 
 batch_size=4
 num_workers=4

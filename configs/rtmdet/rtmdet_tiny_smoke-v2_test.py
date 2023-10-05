@@ -7,8 +7,7 @@ _base_ = [
 
 #checkpoint = "home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune/SSL_resisc45/swav_rtmdet_tiny_syncbn_fast_4xb64-100e_smoke-v2/epoch_100.pth"
 #checkpoint = "/hotdata/Sarah/bbox_mAP_epoch_996.pth"
-#checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune/SSL_flame/swav_flame_rtmdet_tiny_syncbn_fast_4xb32-1000e_smoke-v2/best_coco/bbox_mAP_epoch_999.pth"
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_person_NII_CU/swav_NII_CUU_rtmdet_tiny_syncbn_fast_10xb32-100e_person_NII_CU/best_coco/bbox_mAP_epoch_86.pth"
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_smoke-v2/SSL_mix_patternnet_wildfire/swav_patternnet_smk_rtmdet_tiny_syncbn_fast_4xb32-1000e_smoke-v2/best_coco/bbox_mAP_epoch_1000.pth"
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]

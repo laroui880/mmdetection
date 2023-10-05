@@ -5,24 +5,25 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/train/coco/NII_CU_rgb.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/FPDS_2classes/train/annotations/coco/FPDS-fall-person.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/FPDS_2classes/train/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/FPDS_2classes/valid/annotations/coco/FPDS-fall-person.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/FPDS_2classes/valid/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/FPDS_2classes/test/annotations/coco/FPDS-fall-person.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/FPDS_2classes/test/images/'  #'  # Prefix of test image path
 
 batch_size=4
-num_workers=10
+num_workers=4
 persistent_workers=True
-img_scale = (2688, 1952)#(640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+img_scale = (640, 480)
 
-num_classes = 1  # Number of classes for classification
-classes = ["person"]
+mean = [100.05190143, 115.3550406, 137.46542651]
+std = [46.53901091, 48.10554622, 47.61158509]
+
+num_classes = 2  # Number of classes for classification
+classes = ["Person", "Fall"]
 
 # Pipelines
 train_pipeline = [

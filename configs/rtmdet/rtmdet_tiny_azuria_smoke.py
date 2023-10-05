@@ -4,8 +4,8 @@ _base_ = [
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
-checkpoint = '/home/sarah.laroui/workspace/bfte/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb64-mcrop-2-6-coslr-1000e_mixdata_patternnet_smk-224-96/epoch_1000.pth'
-ssl_method = 'ssl_patternnet_smk_frozen1'
+checkpoint = '/hotdata/userdata/sarah.laroui/workspace/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb64-mcrop-2-6-coslr-1000e_mixdata_patternnet_smk-224-96/epoch_1000.pth'
+ssl_method = 'test'#'ssl_patternnet_smk_frozen1'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -21,7 +21,7 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 3000
+max_epochs = 50# 3000
 stage2_num_epochs = 20
 base_lr = 0.004
 interval = 3
@@ -43,7 +43,7 @@ loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.6#5
 # -----save train data-----
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_azuria-smoke-v2/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke_detection"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_azuria-smoke-v2/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke_detection"
 
 
 #=============================================
@@ -230,23 +230,23 @@ param_scheduler = [
 ]
 
 # hooks: https://github.com/open-mmlab/mmengine/blob/main/docs/en/tutorials/hook.md
-default_hooks = dict(
-    checkpoint=dict(
-        type='CheckpointHook',
-        interval=interval,
-        max_keep_ckpts=max_keep_ckpts,
-        save_best='auto'  
-    ),
-    visualization=dict(draw=True, interval=max_epochs-1), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
-    logger=dict(type='LoggerHook', interval=interval))
+# default_hooks = dict(
+#     checkpoint=dict(
+#         type='CheckpointHook',
+#         interval=interval,
+#         max_keep_ckpts=max_keep_ckpts,
+#         save_best='auto'  
+#     ),
+#     visualization=dict(draw=True, interval=max_epochs-1), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
+#     logger=dict(type='LoggerHook', interval=interval))
 
 custom_hooks = [
-    dict(
-        type='EMAHook',
-        ema_type='ExpMomentumEMA',
-        momentum=0.0002,
-        update_buffers=True,
-        priority=49),
+    # dict(
+    #     type='EMAHook',
+    #     ema_type='ExpMomentumEMA',
+    #     momentum=0.0002,
+    #     update_buffers=True,
+    #     priority=49),
     dict(
         type='PipelineSwitchHook',
         switch_epoch=max_epochs - stage2_num_epochs,
@@ -254,8 +254,8 @@ custom_hooks = [
 ]
 
 vis_backends = [dict(type='TensorboardVisBackend'), dict(type='LocalVisBackend')]
-visualizer = dict(
-    type='DetLocalVisualizer',
-    vis_backends=vis_backends,
-    name='visualizer')
+# visualizer = dict(
+#     type='DetLocalVisualizer',
+#     vis_backends=vis_backends,
+#     name='visualizer')
 

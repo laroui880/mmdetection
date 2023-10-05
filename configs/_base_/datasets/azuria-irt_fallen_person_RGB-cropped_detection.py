@@ -5,35 +5,41 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/train/coco/NII_CU_rgb.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/rgb-cropped/coco/train.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/rgb-cropped/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/rgb-cropped/coco/val.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/rgb-cropped/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/rgb-cropped/coco/test.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/rgb-cropped/'   # Prefix of test image path
 
-batch_size=4
-num_workers=10
+batch_size=8
+num_workers=4
 persistent_workers=True
-img_scale = (2688, 1952)#(640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+img_scale = (1120, 832)  
 
-num_classes = 1  # Number of classes for classification
-classes = ["person"]
+####################### 8 bits ########################
+mean = [85.84911538, 113.53182832, 110.5498502]
+std = [53.94329081, 44.54936323, 47.25700092]
+
+####################### 16 bits ########################
+# mean = [22059.34363409, 29173.45645029, 28407.16136796]
+# std = [13872.54503051, 11460.2944426,  12154.67196096]
+
+num_classes = 2  # Number of classes for classification
+classes = ["Person", "Fall"]
 
 # Pipelines
 train_pipeline = [
-    dict(type='LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', to_float32=True, file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='LoadImageFromFile', to_float32=True, file_client_args=file_client_args),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(type='Resize', scale=img_scale, keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
@@ -58,6 +64,8 @@ train_dataloader = dict(
         data_prefix=dict(img=train_data_prefix),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline))
+
+        
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -100,4 +108,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/person_detection')
+    outfile_prefix='results/fallen_person_azuria_detection')

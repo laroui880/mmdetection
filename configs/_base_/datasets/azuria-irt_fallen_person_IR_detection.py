@@ -5,24 +5,25 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/train/coco/NII_CU_rgb.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/ir-cropped/coco/train.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/ir-cropped/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/ir-cropped/coco/val.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/ir-cropped/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/azuria_fall_person/annotations/ir-cropped/coco/test.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/azuria_fall_person/images/ir-cropped/'   # Prefix of test image path
 
-batch_size=4
-num_workers=10
+batch_size = 8
+num_workers = 4
 persistent_workers=True
-img_scale = (2688, 1952)#(640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+img_scale = (1120, 832)
 
-num_classes = 1  # Number of classes for classification
-classes = ["person"]
+mean = [25388.5302011, 25388.5302011, 25388.5302011]
+std = [856.66479793, 856.66479793, 856.66479793]
+
+num_classes = 2  # Number of classes for classification
+classes = ["Person", "Fall"]
 
 # Pipelines
 train_pipeline = [
@@ -58,6 +59,7 @@ train_dataloader = dict(
         data_prefix=dict(img=train_data_prefix),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline))
+        
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -100,4 +102,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/person_detection')
+    outfile_prefix='results/fallen_person_azuria_detection')

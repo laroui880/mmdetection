@@ -5,21 +5,25 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/train/coco/NII_CU_rgbir.json'
-train_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb-ir/train/coco/NII_CU_rgb-ir.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/train/'  # Prefix of train image path
+
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/val/coco/NII_CU_rgbir.json'
-val_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb-ir/val/coco/NII_CU_rgb-ir.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgbir/val/coco/NII_CU_rgbir.json'
-test_data_prefix = '/hotdata/userdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_rgb-ir/val/coco/NII_CU_rgb-ir.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb_ir/val/'  #'  # Prefix of test image path
 
 batch_size=4
-num_workers=4
+num_workers=10
 persistent_workers=True
-img_scale = (640, 480)
-mean = [100.363, 88.385, 77.99474, 118.16]
-std = [37.12337, 32.39224, 29.420309, 18.1]
+img_scale =(2688, 1952)# (832, 1088) #(640, 480)
+# mean = [100.363, 88.385, 77.99474, 118.16]
+# std = [37.12337, 32.39224, 29.420309, 18.1]
+
+mean = [82.96518237, 87.00195098, 95.68444293, 118.30158302]
+std = [34.37892615, 33.42075506, 37.73696908, 13.01905323]
 
 num_classes = 1  # Number of classes for classification
 classes = ["person"]

@@ -115,9 +115,12 @@ data
 *.log.json
 docs/modelzoo_statistics.md
 mmdet/.mim
-work_dirs/
+workdir/
+*results/
+tensorboard/
 
 # Pytorch
 *.pth
 *.py~
 *.sh~
+*.pt

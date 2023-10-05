@@ -5,14 +5,14 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-train/annotations/coco/train.json'
-train_data_prefix = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-train/images/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-train/annotations/coco/visdrone19-person.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-train/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-val/annotations/coco/val.json'
-val_data_prefix = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-val/images/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-val/annotations/coco/visdrone19-person.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-val/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-test-dev/annotations/coco/test.json'
-test_data_prefix = '/hotdata/dataset/VisDrone2019/VisDrone2019-DET-test-dev/images/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-test-dev/annotations/coco/visdrone19-person.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/VisDrone2019/VisDrone2019-DET-test-dev/images/'  #'  # Prefix of test image path
 
 batch_size=64
 num_workers=10
@@ -22,8 +22,8 @@ img_scale = (640, 480)
 mean = [92.44605576, 95.64404344, 94.26169986]
 std = [49.24513717, 46.67315337, 48.76896994]
 
-num_classes = 1  # Number of classes for classification
-classes = ["0", "1"]
+num_classes = 3  # Number of classes for classification
+classes = ["pedestrian", "person", "bicycle"]
 
 # Pipelines
 train_pipeline = [

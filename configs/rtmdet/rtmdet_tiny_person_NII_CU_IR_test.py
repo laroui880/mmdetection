@@ -5,7 +5,8 @@ _base_ = [
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_person_NII_CU_IR/swav_visdrone19_rtmdet_tiny_syncbn_fast_10xb32-100e_person_NII_CU/best_coco/bbox_mAP_epoch_88.pth"
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_person_NII_CU_IR/new_from_scratch_RGB_size_img_rtmdet_tiny_syncbn_fast_10xb4-100e_person_NII_CU/best_coco/bbox_mAP_epoch_100.pth"
+ssl_method = 'new_from_scratch_2688x1952'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -44,9 +45,12 @@ qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.65
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/test_person_NII_CU_IR/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_IR"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/test_person_NII_CU_IR/from_scratch/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_IR"
 
 #=============================================
+
+#=============================================
+
 model = dict(
     type='RTMDet',
     data_preprocessor=dict(
@@ -69,7 +73,8 @@ model = dict(
             prefix='backbone.',
             checkpoint=checkpoint,
             map_location='cpu'
-        )),
+        ),
+        frozen_stages=4),
     neck=dict(
         type='CSPNeXtPAFPN',
         in_channels=[96, 192, 384],
@@ -115,7 +120,7 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
+    # dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
     dict(
         type='RandomResize',
         scale=(img_scale[0] * 2, img_scale[1] * 2),
@@ -125,12 +130,12 @@ train_pipeline = [
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
     dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
-    dict(
-        type='CachedMixUp',
-        img_scale=img_scale,
-        ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
-        max_cached_images=mixup_max_cached_images,
-        pad_val=(114, 114, 114)),
+    # dict(
+    #     type='CachedMixUp',
+    #     img_scale=img_scale,
+    #     ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
+    #     max_cached_images=mixup_max_cached_images,
+    #     pad_val=(114, 114, 114)),
     dict(type='PackDetInputs')
 ]
 
@@ -217,7 +222,7 @@ default_hooks = dict(
         max_keep_ckpts=max_keep_ckpts,
         save_best='auto'  
     ),
-    visualization=dict(draw=False), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
+    visualization=dict(draw=True, interval=max_epochs-1), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
     logger=dict(type='LoggerHook', interval=interval))
 
 custom_hooks = [
@@ -238,5 +243,3 @@ visualizer = dict(
     type='DetLocalVisualizer',
     vis_backends=vis_backends,
     name='visualizer')
-
-#    save_dir="/home/sarah.laroui/workspace/bfte/mmdetection/results/test",

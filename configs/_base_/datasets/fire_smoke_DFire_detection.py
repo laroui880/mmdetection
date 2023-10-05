@@ -5,25 +5,26 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/train.json'
-train_data_prefix = '/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/train/annotations/coco/DFire.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/train/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/val.json'
-val_data_prefix = '/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/annotations/coco/DFire.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/test.json'
-test_data_prefix = '/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/annotations/coco/DFire.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/images/'   # Prefix of test image path
 
-batch_size=4
+batch_size=16
 num_workers=4
 persistent_workers=True
-img_scale = (640, 480)
+img_scale = (1248, 704)  
 
-mean = [92.49140273, 110.37432834, 103.5576183]
-std = [59.10496713, 49.82381166, 51.72350149]
+mean = [88.95, 114.77, 111.03]
+std = [59.1, 49.55, 51.78]
 
 num_classes = 2  # Number of classes for classification
-classes = ["Person", "Lying_Person"]
+classes = ["Fire", "Smoke"]
+
 
 # Pipelines
 train_pipeline = [
@@ -59,6 +60,8 @@ train_dataloader = dict(
         data_prefix=dict(img=train_data_prefix),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline))
+
+        
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -101,4 +104,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/person_detection')
+    outfile_prefix='results/fire_smoke_DFire_detection')

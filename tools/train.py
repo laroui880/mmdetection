@@ -55,6 +55,12 @@ def parse_args():
 
 
 def main():
+
+    from codecarbon import EmissionsTracker
+    
+    tracker = EmissionsTracker()
+    tracker.start()
+
     args = parse_args()
 
     # load config
@@ -118,6 +124,9 @@ def main():
 
     # start training
     runner.train()
+
+    tracker.stop()
+
 
 
 if __name__ == '__main__':

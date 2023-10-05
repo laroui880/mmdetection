@@ -5,25 +5,23 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/train.json'
-train_data_prefix = '/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/smoke/c2rd/annotations/train.json'
+train_data_prefix = ''  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/val.json'
-val_data_prefix = '/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/smoke/c2rd/annotations/val.json'
+val_data_prefix = ''  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/dataset/azuria_fall_person/annotations/coco/test.json'
-test_data_prefix = '/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/smoke/c2rd/annotations/test.json'
+test_data_prefix = ''  # Prefix of test image path
 
-batch_size=8
-num_workers=10
+batch_size=4
+num_workers=4
 persistent_workers=True
-img_scale = (640, 480)
-
-mean = [92.49140273, 110.37432834, 103.5576183]
-std = [59.10496713, 49.82381166, 51.72350149]
-
-num_classes = 2  # Number of classes for classification
-classes = ["Person", "Lying_Person"]
+img_scale = (1920, 1088)
+mean = [141.38509574, 113.17297767, 106.97039922]
+std = [32.00890002, 23.07553553, 18.48863978]
+num_classes = 1  # Number of classes for classification
+classes = ["smoke"]
 
 # Pipelines
 train_pipeline = [
@@ -101,4 +99,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/person_detection')
+    outfile_prefix='results/smoke-c2rd_detection')

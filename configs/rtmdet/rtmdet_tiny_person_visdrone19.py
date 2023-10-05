@@ -5,8 +5,8 @@ _base_ = [
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/data/userdata/datasets_tmp/__hotdata__/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
-ssl_method = 'coco_pretrain'
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/coco/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
+ssl_method = 'coco_pretrain_freeze4'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -22,7 +22,7 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 3000
+max_epochs = 300
 stage2_num_epochs = 20
 base_lr = 0.004
 interval = 3
@@ -71,9 +71,9 @@ model = dict(
             prefix='backbone.',
             checkpoint=checkpoint,
             map_location='cpu'
-        )),
-        #,
-        #frozen_stages=1),
+        ),
+        frozen_stages=4,
+        ),
     neck=dict(
         type='CSPNeXtPAFPN',
         in_channels=[96, 192, 384],

@@ -5,19 +5,19 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/train/coco/NII_CU_rgb.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_fused/train/coco/NII_CU_rgb.json' #_fused.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/fused_2706x1980/train/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_fused/val/coco/NII_CU_rgb.json' #_fused.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/fused_2706x1980/val/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_fused/val/coco/NII_CU_rgb.json' #_fused.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/fused_2706x1980/val/'  #'  # Prefix of test image path
 
 batch_size=4
 num_workers=10
 persistent_workers=True
-img_scale = (2688, 1952)#(640, 480)
+img_scale = (2688, 1952) #(704,512)  #(640, 480)
 mean = [100.363, 88.385, 77.99474]
 std = [37.12337, 32.39224, 29.420309]
 

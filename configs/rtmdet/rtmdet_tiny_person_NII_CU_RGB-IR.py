@@ -5,8 +5,8 @@ _base_ = [
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb32-mcrop-2-6-coslr-1000e_nii_cu_rgbir-224-96/epoch_1000.pth"
-ssl_method = 'swav_NII_CU_RGBIR'
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb32-mcrop-2-6-coslr-1000e_nii_cu_rgbir-224-96/epoch_1000.pth"
+ssl_method = '2688x1952_archP6'
 
 
 env_cfg = dict(cudnn_benchmark=True)
@@ -23,7 +23,7 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 2
+max_epochs = 100
 stage2_num_epochs = 20
 base_lr = 0.004
 interval = 10
@@ -47,34 +47,38 @@ nms_iou = 0.65
 
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_person_NII_CU_RGB-IR/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_person_NII_CU_RGB-IR/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_RGB-IR"
 
 #=============================================
 
-#  data_preprocessor=dict(
-#         type='DetDataPreprocessor',
-#         mean=mean,
-#         std=std,
-#         bgr_to_rgb=False,
-#         batch_augments=None),
+#  init_cfg=dict(
+#             type='Pretrained',
+#             prefix='backbone.',
+#             checkpoint=checkpoint,
+#             map_location='cpu'
+#         ),
+#         frozen_stages=4
+
 
 model = dict(
     type='RTMDet',
+    data_preprocessor=dict(
+        type='DetDataPreprocessor',
+        mean=mean,
+        std=std,
+        bgr_to_rgb=False,
+        batch_augments=None
+        ),
     backbone=dict(
         type='CSPNeXt',
-        arch='P5',
+        arch='P6',
+        in_channels=4,
         expand_ratio=0.5,
         deepen_factor=deepen_factor,
         widen_factor=widen_factor,
         channel_attention=True,
         norm_cfg=norm_cfg,
-        act_cfg=dict(type='SiLU', inplace=True),
-        init_cfg=dict(
-            type='Pretrained',
-            prefix='backbone.',
-            checkpoint=checkpoint,
-            map_location='cpu'
-        )),
+        act_cfg=dict(type='SiLU', inplace=True)),
     neck=dict(
         type='CSPNeXtPAFPN',
         in_channels=[96, 192, 384],
@@ -120,27 +124,27 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(
-        type='Resize',
-        scale_factor=1.0,
-        keep_ratio=True),
-    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     #dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
+    dict(
+        type='RandomResize',
+        scale=(img_scale[0] * 2, img_scale[1] * 2),
+        ratio_range=random_resize_ratio_range,
+        keep_ratio=True),
+
     # dict(
-    #     type='RandomResize',
-    #     scale=(img_scale[0] * 2, img_scale[1] * 2),
-    #     ratio_range=random_resize_ratio_range,
+    #     type='Resize',
+    #     scale_factor=1.0,
     #     keep_ratio=True),
-    # dict(type='RandomCrop', crop_size=img_scale),
-    # dict(type='YOLOXHSVRandomAug'),
+    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
+    dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     # dict(
     #     type='CachedMixUp',
     #     img_scale=img_scale,
     #     ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
     #     max_cached_images=mixup_max_cached_images,
-    #     pad_val=(114, 114, 114, 114)),
+    #     pad_val=(114, 114, 114)),
     dict(type='PackDetInputs')
 ]
 
@@ -148,27 +152,38 @@ train_pipeline_stage2 = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
-        type='Resize',
-        scale_factor=1.0,
+        type='RandomResize',
+        scale=img_scale,
+        ratio_range=random_resize_ratio_range,
         keep_ratio=True),
-    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     # dict(
-    #     type='RandomResize',
-    #     scale=img_scale,
-    #     ratio_range=random_resize_ratio_range,
+    #     type='Resize',
+    #     scale_factor=1.0,
     #     keep_ratio=True),
-    # dict(type='RandomCrop', crop_size=img_scale),
-    # dict(type='YOLOXHSVRandomAug'),
+    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
+    dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114, 114))),
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(type='PackDetInputs')
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
-    dict(type='LoadAnnotations', with_bbox=True),
+    
+    # dict(
+    #     type='Resize',
+    #     scale_factor=1.0,
+    #     keep_ratio=True),
+
     dict(type='Resize', scale=img_scale, keep_ratio=True),
-    # dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
+
+    # dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
+
+    # dict(type='Resize', scale=img_scale, keep_ratio=True),
+    dict(type='LoadAnnotations', with_bbox=True),
+    
+
+    dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(
         type='PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
@@ -212,7 +227,7 @@ param_scheduler = [
         start_factor=lr_start_factor,
         by_epoch=False,
         begin=0,
-        end=1000),
+        end=max_epochs),
     dict(
         # use cosine lr from 150 to 300 epoch
         type='CosineAnnealingLR',
@@ -232,7 +247,7 @@ default_hooks = dict(
         max_keep_ckpts=max_keep_ckpts,
         save_best='auto'  
     ),
-    visualization=dict(draw=False), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
+    visualization=dict(draw=True, interval=max_epochs-1), # https://mmdetection.readthedocs.io/en/3.x/api.html#mmdet.engine.hooks.DetVisualizationHook
     logger=dict(type='LoggerHook', interval=interval))
 
 custom_hooks = [
@@ -253,4 +268,3 @@ visualizer = dict(
     type='DetLocalVisualizer',
     vis_backends=vis_backends,
     name='visualizer')
-

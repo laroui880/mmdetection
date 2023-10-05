@@ -1,13 +1,11 @@
 _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_1x.py',
-    '../_base_/datasets/person_NII_CU_RGB0_detection.py', './rtmdet_tta.py'
+    '../_base_/datasets/fire_smoke_detection.py', './rtmdet_tta.py'
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb32-mcrop-2-6-coslr-1000e_nii_cu_rgbir-224-96/epoch_1000.pth"
-ssl_method = '2688x1952'
-
+checkpoint = '/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_azuria-smoke-v2/ssl_patternnet_smk_frozen1_rtmdet_tiny_syncbn_fast_4xb4-3000e_smoke_detection/best_coco/bbox_mAP_epoch_620.pth'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -44,22 +42,12 @@ loss_cls_weight = 1.0
 loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
 nms_iou = 0.65
-
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_person_NII_CU_RGB-0/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_RGB-IR"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/test_fire_smoke/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_fallen_person_azuria"
+
 
 #=============================================
-
-#  init_cfg=dict(
-#             type='Pretrained',
-#             prefix='backbone.',
-#             checkpoint=checkpoint,
-#             map_location='cpu'
-#         ),
-#         frozen_stages=4
-
-
 model = dict(
     type='RTMDet',
     data_preprocessor=dict(
@@ -67,18 +55,23 @@ model = dict(
         mean=mean,
         std=std,
         bgr_to_rgb=False,
-        batch_augments=None
-        ),
+        batch_augments=None),
     backbone=dict(
         type='CSPNeXt',
         arch='P5',
-        in_channels=4,
         expand_ratio=0.5,
         deepen_factor=deepen_factor,
         widen_factor=widen_factor,
         channel_attention=True,
         norm_cfg=norm_cfg,
-        act_cfg=dict(type='SiLU', inplace=True)),
+        act_cfg=dict(type='SiLU', inplace=True),
+        init_cfg=dict(
+            type='Pretrained',
+            prefix='backbone.',
+            checkpoint=checkpoint,
+            map_location='cpu'
+        ),
+        frozen_stages=1),
     neck=dict(
         type='CSPNeXtPAFPN',
         in_channels=[96, 192, 384],
@@ -122,19 +115,19 @@ model = dict(
 )
 
 train_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    #dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
-    dict(
-        type='RandomResize',
-        scale=(img_scale[0] * 2, img_scale[1] * 2),
-        ratio_range=random_resize_ratio_range,
-        keep_ratio=True),
-
+    dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
     # dict(
-    #     type='Resize',
-    #     scale_factor=1.0,
+    #     type='RandomResize',
+    #     scale=(img_scale[0] * 2, img_scale[1] * 2),
+    #     ratio_range=random_resize_ratio_range,
     #     keep_ratio=True),
+
+    dict(
+        type='Resize',
+        scale_factor=1.0,
+        keep_ratio=True),
     dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
@@ -149,17 +142,17 @@ train_pipeline = [
 ]
 
 train_pipeline_stage2 = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(
-        type='RandomResize',
-        scale=img_scale,
-        ratio_range=random_resize_ratio_range,
-        keep_ratio=True),
     # dict(
-    #     type='Resize',
-    #     scale_factor=1.0,
+    #     type='RandomResize',
+    #     scale=img_scale,
+    #     ratio_range=random_resize_ratio_range,
     #     keep_ratio=True),
+    dict(
+        type='Resize',
+        scale_factor=1.0,
+        keep_ratio=True),
     dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
@@ -168,18 +161,16 @@ train_pipeline_stage2 = [
 ]
 
 test_pipeline = [
-    dict(type='LoadImageFromFile', color_type= 'unchanged', file_client_args={{_base_.file_client_args}}),
+    dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     
     # dict(
     #     type='Resize',
     #     scale_factor=1.0,
     #     keep_ratio=True),
 
-    dict(type='Resize', scale=img_scale, keep_ratio=True),
-
     # dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
 
-    # dict(type='Resize', scale=img_scale, keep_ratio=True),
+    dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='LoadAnnotations', with_bbox=True),
     
 
@@ -268,3 +259,4 @@ visualizer = dict(
     type='DetLocalVisualizer',
     vis_backends=vis_backends,
     name='visualizer')
+

@@ -2,6 +2,7 @@ _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_1x.py',
     '../_base_/datasets/fallen_person_azuria_detection.py', './rtmdet_tta.py'
 ]
+
 # ==============Custom Variables==============
 # -----runtime related-----
 

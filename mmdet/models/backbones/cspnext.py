@@ -21,6 +21,8 @@ class CSPNeXt(BaseModule):
     Args:
         arch (str): Architecture of CSPNeXt, from {P5, P6}.
             Defaults to P5.
+        expand_ratio (float): Ratio to adjust the number of channels of the
+            hidden layer. Defaults to 0.5.
         deepen_factor (float): Depth multiplier, multiply number of
             blocks in CSP layer by this amount. Defaults to 1.0.
         widen_factor (float): Width multiplier, multiply number of
@@ -51,7 +53,6 @@ class CSPNeXt(BaseModule):
     """
     # From left to right:
     # in_channels, out_channels, num_blocks, add_identity, use_spp
-
     arch_settings = {
         'P5': [[64, 128, 3, True, False], [128, 256, 6, True, False],
                [256, 512, 6, True, False], [512, 1024, 3, False, True]],
@@ -63,6 +64,7 @@ class CSPNeXt(BaseModule):
     def __init__(
         self,
         arch: str = 'P5',
+        in_channels: int = 3,#4,
         deepen_factor: float = 1.0,
         widen_factor: float = 1.0,
         out_indices: Sequence[int] = (2, 3, 4),
@@ -85,7 +87,7 @@ class CSPNeXt(BaseModule):
             nonlinearity='leaky_relu')
     ) -> None:
         super().__init__(init_cfg=init_cfg)
-        arch_setting = self.arch_settings[arch]
+        arch_setting = self.arch_settings[arch]       
         if arch_ovewrite:
             arch_setting = arch_ovewrite
         assert set(out_indices).issubset(
@@ -102,7 +104,7 @@ class CSPNeXt(BaseModule):
         conv = DepthwiseSeparableConvModule if use_depthwise else ConvModule
         self.stem = nn.Sequential(
             ConvModule(
-                3,
+                in_channels,
                 int(arch_setting[0][0] * widen_factor // 2),
                 3,
                 padding=1,
@@ -126,7 +128,6 @@ class CSPNeXt(BaseModule):
                 norm_cfg=norm_cfg,
                 act_cfg=act_cfg))
         self.layers = ['stem']
-
 
         for i, (in_channels, out_channels, num_blocks, add_identity,
                 use_spp) in enumerate(arch_setting):

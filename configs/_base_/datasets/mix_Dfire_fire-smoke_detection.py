@@ -5,24 +5,32 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/train/coco/NII_CU_rgb.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/annotations/coco/train.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/images/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/annotations/coco/val.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/images/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations/val/coco/NII_CU_rgb.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/rgb/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/annotations/coco/test.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/Mix_fire_smoke_datasets/images/'   # Prefix of test image path
 
 batch_size=4
-num_workers=10
+num_workers=4
 persistent_workers=True
-img_scale = (2688, 1952)#(640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+img_scale = (640, 640) #(960,640)  
 
-num_classes = 1  # Number of classes for classification
-classes = ["person"]
+# mean = [88.95, 114.77, 111.03]
+# std = [59.1, 49.55, 51.78]
+
+# mean = [91.43934575, 93.29078565, 95.45397797]
+# std = [59.87754312, 55.20683287, 56.10372258]
+
+mean = [92.15155173, 94.68531598, 98.2375081]
+std = [59.30480114, 55.57348917, 56.97469809]
+
+num_classes = 2  # Number of classes for classification
+classes = ["Fire", "Smoke"]
+
 
 # Pipelines
 train_pipeline = [
@@ -58,6 +66,8 @@ train_dataloader = dict(
         data_prefix=dict(img=train_data_prefix),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline))
+
+        
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -100,4 +110,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/person_detection')
+    outfile_prefix='results/fire_smoke_DFire_detection')

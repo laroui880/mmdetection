@@ -5,21 +5,21 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/train/coco/NII_CU_thermal.json'
-train_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/train/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/train/coco/NII_CU_ir.json'
+train_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/train/'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/val/coco/NII_CU_thermal.json'
-val_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/val/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/val/coco/NII_CU_ir.json'
+val_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/val/'  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/val/coco/NII_CU_thermal.json'
-test_data_prefix = '/hotdata/dataset/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/val/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/annotations_thermal/val/coco/NII_CU_ir.json'
+test_data_prefix = '/hotdata/userdata/datasets/detection/NII_CU_MAPD_RGB-IR/4-channel/images/thermal/val/'  #'  # Prefix of test image path
 
-batch_size=8
+batch_size=4
 num_workers=10
 persistent_workers=True
-img_scale = (640, 480)
-mean = [100.363, 88.385, 77.99474]
-std = [37.12337, 32.39224, 29.420309]
+img_scale = (2688,1952) #(640, 480)  # (704, 512) 
+mean = [118.16, 118.16, 118.16]
+std = [18.12, 18.12, 18.12]
 
 num_classes = 1  # Number of classes for classification
 classes = ["person"]

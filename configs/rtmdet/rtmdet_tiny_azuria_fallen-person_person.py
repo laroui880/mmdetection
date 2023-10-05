@@ -5,9 +5,8 @@ _base_ = [
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_roboflow_fallen-person_person/coco_pretrain_freeze_rtmdet_tiny_syncbn_fast_10xb64-1000e_fallen_person_azuria/best_coco/bbox_mAP_epoch_618.pth"
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_roboflow_fallen-person_person/coco_pretrain_freeze_rtmdet_tiny_syncbn_fast_10xb64-1000e_fallen_person_azuria/best_coco/bbox_mAP_epoch_618.pth"
 ssl_method = 'coco_roboflow_fallen-person_person'
-
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]

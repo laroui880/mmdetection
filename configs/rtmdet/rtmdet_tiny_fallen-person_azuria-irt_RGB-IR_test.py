@@ -1,13 +1,12 @@
 _base_ = [
     '../_base_/default_runtime.py', '../_base_/schedules/schedule_1x.py',
-    '../_base_/datasets/person_NII_CU_RGB0_detection.py', './rtmdet_tta.py'
+    '../_base_/datasets/azuria-irt_fallen_person_RGB-IR_detection.py', './rtmdet_tta.py'
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
 
-checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmselfsup/work_dirs/selfsup/swav_cspnext_8xb32-mcrop-2-6-coslr-1000e_nii_cu_rgbir-224-96/epoch_1000.pth"
-ssl_method = '2688x1952'
-
+checkpoint = "mmdetection/configs/rtmdet/rtmdet_tiny_fallen_person_azuria-irt_RGB-IR.py"
+method = 'Azuria_frscratch'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -47,7 +46,7 @@ nms_iou = 0.65
 
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_person_NII_CU_RGB-0/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_RGB-IR"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/test_fallen-person_azuria-irt_RGB-IR/{method}/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_person_NII_CU_RGB-IR"
 
 #=============================================
 
@@ -78,7 +77,14 @@ model = dict(
         widen_factor=widen_factor,
         channel_attention=True,
         norm_cfg=norm_cfg,
-        act_cfg=dict(type='SiLU', inplace=True)),
+        act_cfg=dict(type='SiLU', inplace=True),
+        init_cfg=dict(
+            type='Pretrained',
+            prefix='backbone.',
+            checkpoint=checkpoint,
+            map_location='cpu'
+        ),
+        frozen_stages=1),
     neck=dict(
         type='CSPNeXtPAFPN',
         in_channels=[96, 192, 384],
