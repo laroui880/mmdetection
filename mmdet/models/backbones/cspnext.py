@@ -177,7 +177,7 @@ class CSPNeXt(BaseModule):
                 m = getattr(self, self.layers[i])
                 m.eval()
                 for param in m.parameters():
-                    param.requires_grad = False
+                    param.requires_grad = False  #frozen
 
     def train(self, mode=True) -> None:
         super().train(mode)

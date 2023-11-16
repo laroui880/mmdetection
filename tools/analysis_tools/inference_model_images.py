@@ -118,16 +118,23 @@ def main():
     
     img_path = args.image_path  # '/hotdata/userdata/datasets/detection/augmentation_test_dataset/images/'
 
+    List_images = os.listdir((img_path))
+
     for img in os.listdir((img_path)) :
 
         print('img', img)
 
         #visualize the results in a new window
         im1 = cv2.imread(img_path + img)[:,:,::-1]
-        if im1.shape[0]>im1.shape[1]:
+        if im1.shape[0] > im1.shape[1]:
             continue
 
         result = inference_detector(model, img_path + img)
+        #result, x = inference_detector(model, img_path + img)
+        # result, x = result[0], x[0]
+        # x_flatten = torch.flatten(x)
+
+        # print('x_flatten', x_flatten)
 
         pred_instances = result.pred_instances
 

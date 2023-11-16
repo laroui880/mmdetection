@@ -5,23 +5,23 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/data/datasets_tmp/__hotdata__/detection/fallen_person_roboflow/train/labels/coco/fallen_roboflow.json'
-train_data_prefix = '/data/'  # Prefix of train image path
+train_ann_file = '/data/userdata/datasets_tmp/__hotdata__/detection/fallen_roboflow/train/labels/coco/fallen_roboflow.json'
+train_data_prefix = ''  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/data/datasets_tmp/__hotdata__/detection/fallen_person_roboflow/valid/labels/coco/fallen_roboflow.json'
-val_data_prefix = '/data/'  # Prefix of val image path
+val_ann_file = '/data/userdata/datasets_tmp/__hotdata__/detection/fallen_roboflow/train/labels/coco/fallen_roboflow.json'
+val_data_prefix = ''  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/data/datasets_tmp/__hotdata__/detection/fallen_person_roboflow/test/labels/coco/fallen_roboflow.json'
-test_data_prefix = '/data/'  # Prefix of test image path
+test_ann_file = '/data/userdata/datasets_tmp/__hotdata__/detection/fallen_roboflow/train/labels/coco/fallen_roboflow.json'
+test_data_prefix = ''  # Prefix of test image path
 
-batch_size=32
+batch_size=8
 num_workers=4
 persistent_workers=True
-img_scale = (640, 480)
-mean = [128.646, 110.675, 101.791]
-std = [79.911, 61.817, 54.743]
+img_scale = (640, 640)
+mean = [120.27394303, 138.35899333, 129.48337722]
+std = [39.94286387, 41.18898535, 41.0713326 ]
 num_classes = 1  # Number of classes for classification
-classes = ["fallen_person"]
+classes = ["Fall"]
 
 # Pipelines
 train_pipeline = [
@@ -99,4 +99,4 @@ test_evaluator = dict(
     metric='bbox',
     format_only=True,
     ann_file=data_root + test_ann_file,
-    outfile_prefix='results/fallen_person_detection')
+    outfile_prefix='results/fall_detection')

@@ -4,9 +4,10 @@ _base_ = [
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
-checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/coco/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
-method = 'from_coco'
-#method = 'from_scratch'
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection_private/workdir/coco/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
+# checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-tiny_imagenet_600e.pth'  # noqa
+method = 'from_coco_with_bkg1332'
+
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -22,8 +23,8 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 300
-stage2_num_epochs = 200 #20
+max_epochs = 100
+stage2_num_epochs = 20 #200
 base_lr = 0.0005  #0.004
 interval = 10
 # -----train val related-----
@@ -42,11 +43,11 @@ std = _base_.std
 loss_cls_weight = 1.0
 loss_bbox_weight = 2.0
 qfl_beta = 2.0  # beta of QualityFocalLoss
-nms_iou = 0.65
+nms_iou = 0.1 #0.65
 
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection/workdir/finetune_fire-smoke_DFire/{method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-lr{base_lr}-{max_epochs}e_fire-smoke"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection_private/workdir/finetune_fire-smoke_DFire/{method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-lr{base_lr}-{max_epochs}e_fire-smoke"
 
 #=============================================
 model = dict(

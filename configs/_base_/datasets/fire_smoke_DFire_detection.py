@@ -5,16 +5,16 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/train/annotations/coco/DFire.json'
-train_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/train/images/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/train/annotations/coco/DFire_with_background_img_1332.json'#_with_background_img.json'
+train_data_prefix = ''  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/annotations/coco/DFire.json'
-val_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/images/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/annotations/coco/DFire_with_background_img_480.json'#_with_background_img2.json'
+val_data_prefix = ''  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/annotations/coco/DFire.json'
-test_data_prefix = '/hotdata/userdata/datasets/detection/DFire/D-Fire/test/images/'   # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/smoke/paratronic/annotations/test.json'
+test_data_prefix = ''   # Prefix of test image path
 
-batch_size=16
+batch_size=8
 num_workers=4
 persistent_workers=True
 img_scale = (1248, 704)  
@@ -24,7 +24,6 @@ std = [59.1, 49.55, 51.78]
 
 num_classes = 2  # Number of classes for classification
 classes = ["Fire", "Smoke"]
-
 
 # Pipelines
 train_pipeline = [

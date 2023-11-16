@@ -80,13 +80,18 @@ def calculate_confusion_matrix(dataset,
     num_classes = len(dataset.metainfo['classes'])
     confusion_matrix = np.zeros(shape=[num_classes + 1, num_classes + 1])
     assert len(dataset) == len(results)
+    print('Nb image in test set =', len(results))
+
     prog_bar = ProgressBar(len(results))
+    nb_instance = 0
     for idx, per_img_res in enumerate(results):
         res_bboxes = per_img_res['pred_instances']
         gts = dataset.get_data_info(idx)['instances']
         analyze_per_img_dets(confusion_matrix, gts, res_bboxes, score_thr,
                              tp_iou_thr, nms_iou_thr)
         prog_bar.update()
+        nb_instance += len(gts)
+    print('nb_instance =', nb_instance)
     return confusion_matrix
 
 
@@ -119,7 +124,7 @@ def analyze_per_img_dets(confusion_matrix,
     for gt in gts:
         gt_bboxes.append(gt['bbox'])
         gt_labels.append(gt['bbox_label'])
-
+   
     gt_bboxes = np.array(gt_bboxes)
     gt_labels = np.array(gt_labels)
 
@@ -142,6 +147,7 @@ def analyze_per_img_dets(confusion_matrix,
                         det_match += 1
                         if gt_label == det_label:
                             true_positives[j] += 1  # TP
+                        #true_positives[j] += 1  # TP
                         confusion_matrix[gt_label, det_label] += 1
                 if det_match == 0:  # BG FP
                     confusion_matrix[-1, det_label] += 1
@@ -169,12 +175,12 @@ def plot_confusion_matrix(confusion_matrix,
     """
     # normalize the confusion matrix
     per_label_sums = confusion_matrix.sum(axis=1)[:, np.newaxis]
-    confusion_matrix = \
-        confusion_matrix.astype(np.float32) / per_label_sums * 100
+    print('per_label_sums', per_label_sums)
+    # confusion_matrix = \
+    #     confusion_matrix.astype(np.float32) / per_label_sums * 100
 
     num_classes = len(labels)
-    fig, ax = plt.subplots(
-        figsize=(0.5 * num_classes, 0.5 * num_classes * 0.8), dpi=180)
+    fig, ax = plt.subplots()
     cmap = plt.get_cmap(color_theme)
     im = ax.imshow(confusion_matrix, cmap=cmap)
     plt.colorbar(mappable=im, ax=ax)
@@ -215,14 +221,25 @@ def plot_confusion_matrix(confusion_matrix,
             ax.text(
                 j,
                 i,
-                '{}%'.format(
+                '{}'.format(
                     int(confusion_matrix[
                         i,
                         j]) if not np.isnan(confusion_matrix[i, j]) else -1),
                 ha='center',
                 va='center',
-                color='w',
+                color='k',
                 size=7)
+            # ax.text(
+            #     j,
+            #     i,
+            #     '{}%'.format(
+            #         int(confusion_matrix[
+            #             i,
+            #             j]) if not np.isnan(confusion_matrix[i, j]) else -1),
+            #     ha='center',
+            #     va='center',
+            #     color='k',
+            #     size=7)
 
     ax.set_ylim(len(confusion_matrix) - 0.5, -0.5)  # matplotlib>3.1.1
 
@@ -263,7 +280,7 @@ def main():
                                                   args.tp_iou_thr)
     plot_confusion_matrix(
         confusion_matrix,
-        dataset.metainfo['classes'] + ('background', ),
+        dataset.metainfo['classes'] + ['background'],
         save_dir=args.save_dir,
         show=args.show,
         color_theme=args.color_theme)

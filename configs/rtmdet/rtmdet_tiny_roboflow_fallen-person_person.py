@@ -4,13 +4,8 @@ _base_ = [
 ]
 # ==============Custom Variables==============
 # -----runtime related-----
-
-# checkpoint = "/data/userdata/datasets_tmp/__hotdata__/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
-# ssl_method = 'coco_pretrain_freeze'
-
-checkpoint = "/home/sarah.laroui/workspace/bfte/mmselfsup/work_dirs/selfsup/swav_cspnext_4xb8-mcrop-2-6-coslr-1000e_visdrone19-224-96/epoch_1000.pth"
-ssl_method = 'swav_visdrone19_freeze'
-
+checkpoint = "/hotdata/userdata/sarah.laroui/workspace/mmdetection_private/workdir/coco/rtmdet_tiny_syncbn_fast_8xb32-300e_coco_20230102_140117-dbb1dc83.pth"
+method = 'from_coco'
 
 env_cfg = dict(cudnn_benchmark=True)
 workflow = [('train', 1), ('val', 1)]
@@ -26,10 +21,10 @@ batch_size = _base_.batch_size
 # Number of workers
 num_workers = _base_.num_workers
 
-max_epochs = 1000
+max_epochs = 100
 stage2_num_epochs = 20
 base_lr = 0.004
-interval = 3
+interval = 10
 # -----train val related-----
 lr_start_factor = 1.0e-5
 weight_decay = 0.05 #TODO: to understand
@@ -50,7 +45,7 @@ nms_iou = 0.6#5
 
 # -----save train data-----
 #work_dir = f"/trainings/rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_smoke-v2"
-work_dir = f"/home/sarah.laroui/workspace/bfte/mmdetection/workdir/finetune_roboflow_fallen-person_person/{ssl_method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_fallen_person_azuria"
+work_dir = f"/hotdata/userdata/sarah.laroui/workspace/mmdetection_private//workdir/finetune_mix_azuria_roboflow_fallen-person_person/{method}_rtmdet_tiny_syncbn_fast_{num_workers}xb{batch_size}-{max_epochs}e_fallen_person_azuria"
 
 #=============================================
 model = dict(
@@ -122,43 +117,26 @@ model = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='CachedMosaic', img_scale=img_scale, pad_val=114.0),
-    # dict(
-    #     type='RandomResize',
-    #     scale=(img_scale[0] * 2, img_scale[1] * 2),
-    #     ratio_range=random_resize_ratio_range,
-    #     keep_ratio=True),
-
     dict(
-        type='Resize',
-        scale_factor=1.0,
+        type='RandomResize',
+        scale=(img_scale[0] * 2, img_scale[1] * 2),
+        ratio_range=random_resize_ratio_range,
         keep_ratio=True),
-    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
+    dict(type='RandomCrop', crop_size=img_scale),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
     dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
-    dict(
-        type='CachedMixUp',
-        img_scale=img_scale,
-        ratio_range=(1.0, 1.0), # TODO: search the value for this ratio range (not provided in mmyolo config)
-        max_cached_images=mixup_max_cached_images,
-        pad_val=(114, 114, 114)),
     dict(type='PackDetInputs')
 ]
-
 train_pipeline_stage2 = [
     dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
     dict(type='LoadAnnotations', with_bbox=True),
-    # dict(
-    #     type='RandomResize',
-    #     scale=img_scale,
-    #     ratio_range=random_resize_ratio_range,
-    #     keep_ratio=True),
     dict(
-        type='Resize',
-        scale_factor=1.0,
+        type='RandomResize',
+        scale=img_scale,
+        ratio_range=random_resize_ratio_range,
         keep_ratio=True),
-    dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
+    dict(type='RandomCrop', crop_size=img_scale),
     dict(type='YOLOXHSVRandomAug'),
     dict(type='RandomFlip', prob=0.5),
     dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
@@ -167,18 +145,8 @@ train_pipeline_stage2 = [
 
 test_pipeline = [
     dict(type='LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
-    
-    # dict(
-    #     type='Resize',
-    #     scale_factor=1.0,
-    #     keep_ratio=True),
-
-    # dict(type='RandomCrop', crop_size=img_scale, crop_type='absolute'),
-
-    dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='LoadAnnotations', with_bbox=True),
-    
-
+    dict(type='Resize', scale=img_scale, keep_ratio=True),
     dict(type='Pad', size=img_scale, pad_val=dict(img=(114, 114, 114))),
     dict(
         type='PackDetInputs',

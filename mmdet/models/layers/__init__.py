@@ -12,8 +12,7 @@ from .msdeformattn_pixel_decoder import MSDeformAttnPixelDecoder
 from .normed_predictor import NormedConv2d, NormedLinear
 from .pixel_decoder import PixelDecoder, TransformerEncoderPixelDecoder
 from .positional_encoding import (LearnedPositionalEncoding,
-                                  SinePositionalEncoding,
-                                  SinePositionalEncoding3D)
+                                  SinePositionalEncoding)
 from .res_layer import ResLayer, SimplifiedBasicBlock
 from .se_layer import ChannelAttention, DyReLU, SELayer
 # yapf: disable
@@ -58,6 +57,5 @@ __all__ = [
     'DABDetrTransformerEncoder', 'ConditionalDetrTransformerDecoder',
     'ConditionalDetrTransformerDecoderLayer', 'DinoTransformerDecoder',
     'CdnQueryGenerator', 'Mask2FormerTransformerEncoder',
-    'Mask2FormerTransformerDecoderLayer', 'Mask2FormerTransformerDecoder',
-    'SinePositionalEncoding3D'
+    'Mask2FormerTransformerDecoderLayer', 'Mask2FormerTransformerDecoder'
 ]

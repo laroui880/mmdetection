@@ -27,7 +27,7 @@ class DetTTAModel(BaseTTAModel):
         >>>
         >>> tta_pipeline = [
         >>>     dict(type='LoadImageFromFile',
-        >>>          backend_args=None),
+        >>>          file_client_args=dict(backend='disk')),
         >>>     dict(
         >>>         type='TestTimeAug',
         >>>         transforms=[[
@@ -103,7 +103,7 @@ class DetTTAModel(BaseTTAModel):
         to one prediction.
 
         Args:
-            data_samples (List[DetDataSample]): List of predictions
+            data_samples_list (List[DetDataSample]): List of predictions
             of enhanced data which come form one image.
         Returns:
             List[DetDataSample]: Merged prediction.
@@ -126,7 +126,10 @@ class DetTTAModel(BaseTTAModel):
         merged_labels = torch.cat(aug_labels, dim=0)
 
         if merged_bboxes.numel() == 0:
-            return data_samples[0]
+            det_bboxes = torch.cat([merged_bboxes, merged_scores[:, None]], -1)
+            return [
+                (det_bboxes, merged_labels),
+            ]
 
         det_bboxes, keep_idxs = batched_nms(merged_bboxes, merged_scores,
                                             merged_labels, self.tta_cfg.nms)

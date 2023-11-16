@@ -425,7 +425,7 @@ class RTMDetHead(ATSSHead):
               of all priors in the image with shape (N,).
         """
         inside_flags = anchor_inside_flags(flat_anchors, valid_flags,
-                                           img_meta['img_shape'][:2],
+                                           img_meta['pad_shape'][:2],
                                            self.train_cfg['allowed_border'])
         if not inside_flags.any():
             return (None, ) * 7

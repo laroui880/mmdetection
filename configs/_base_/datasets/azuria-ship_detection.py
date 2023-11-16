@@ -5,19 +5,19 @@ data_root = ""
 file_client_args = dict(backend='disk')
 
 # Path of train annotation file
-train_ann_file = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/annotations/coco/train.json'
-train_data_prefix = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/images/'  # Prefix of train image path
+train_ann_file = '/hotdata/userdata/datasets/detection/ship_azuria_raw/annotations/coco/train.json'
+train_data_prefix = ''  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/annotations/coco/val.json'
-val_data_prefix = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/images/'  # Prefix of val image path
+val_ann_file = '/hotdata/userdata/datasets/detection/ship_azuria_raw/annotations/coco/val.json'
+val_data_prefix = ''  # Prefix of val image path
 # Path of test annotation file
-test_ann_file = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/annotations/coco/test.json'
-test_data_prefix = '/data/datasets_tmp/__hotdata__/detection/ship_azuria_raw/images/'  #'  # Prefix of test image path
+test_ann_file = '/hotdata/userdata/datasets/detection/ship_azuria_raw/annotations/coco/test.json'
+test_data_prefix = ''  #'  # Prefix of test image path
 
 batch_size=4
 num_workers=4
 persistent_workers=True
-img_scale = (640, 480)
+img_scale = (1920, 1088)
 mean = [142.77898509, 107.60247688, 101.2352314]
 std = [53.48772932, 43.03779713, 38.43625809]
 
@@ -58,6 +58,7 @@ train_dataloader = dict(
         data_prefix=dict(img=train_data_prefix),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline))
+
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,

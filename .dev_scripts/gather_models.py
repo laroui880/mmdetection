@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
 import glob
-import os
+import json
 import os.path as osp
 import shutil
 import subprocess
-import time
 from collections import OrderedDict
 
 import torch
@@ -33,14 +32,10 @@ def process_checkpoint(in_file, out_file):
     # remove optimizer for smaller file size
     if 'optimizer' in checkpoint:
         del checkpoint['optimizer']
-    if 'ema_state_dict' in checkpoint:
-        del checkpoint['ema_state_dict']
 
     # remove ema state_dict
     for key in list(checkpoint['state_dict']):
         if key.startswith('ema_'):
-            checkpoint['state_dict'].pop(key)
-        elif key.startswith('data_preprocessor'):
             checkpoint['state_dict'].pop(key)
 
     # if it is necessary to remove some sensitive data in checkpoint['meta'],
@@ -57,15 +52,15 @@ def process_checkpoint(in_file, out_file):
 
 def is_by_epoch(config):
     cfg = Config.fromfile('./configs/' + config)
-    return cfg.train_cfg.type == 'EpochBasedTrainLoop'
+    return cfg.runner.type == 'EpochBasedRunner'
 
 
 def get_final_epoch_or_iter(config):
     cfg = Config.fromfile('./configs/' + config)
-    if cfg.train_cfg.type == 'EpochBasedTrainLoop':
-        return cfg.train_cfg.max_epochs
+    if cfg.runner.type == 'EpochBasedRunner':
+        return cfg.runner.max_epochs
     else:
-        return cfg.train_cfg.max_iters
+        return cfg.runner.max_iters
 
 
 def get_best_epoch_or_iter(exp_dir):
@@ -79,22 +74,60 @@ def get_best_epoch_or_iter(exp_dir):
 
 def get_real_epoch_or_iter(config):
     cfg = Config.fromfile('./configs/' + config)
-    if cfg.train_cfg.type == 'EpochBasedTrainLoop':
-        epoch = cfg.train_cfg.max_epochs
+    if cfg.runner.type == 'EpochBasedRunner':
+        epoch = cfg.runner.max_epochs
+        if cfg.data.train.type == 'RepeatDataset':
+            epoch *= cfg.data.train.times
         return epoch
     else:
-        return cfg.train_cfg.max_iters
+        return cfg.runner.max_iters
 
 
 def get_final_results(log_json_path,
                       epoch_or_iter,
-                      results_lut='coco/bbox_mAP',
+                      results_lut,
                       by_epoch=True):
     result_dict = dict()
-    with open(log_json_path) as f:
-        r = f.readlines()[-1]
-        last_metric = r.split(',')[0].split(': ')[-1].strip()
-    result_dict[results_lut] = last_metric
+    last_val_line = None
+    last_train_line = None
+    last_val_line_idx = -1
+    last_train_line_idx = -1
+    with open(log_json_path, 'r') as f:
+        for i, line in enumerate(f.readlines()):
+            log_line = json.loads(line)
+            if 'mode' not in log_line.keys():
+                continue
+
+            if by_epoch:
+                if (log_line['mode'] == 'train'
+                        and log_line['epoch'] == epoch_or_iter):
+                    result_dict['memory'] = log_line['memory']
+
+                if (log_line['mode'] == 'val'
+                        and log_line['epoch'] == epoch_or_iter):
+                    result_dict.update({
+                        key: log_line[key]
+                        for key in results_lut if key in log_line
+                    })
+                    return result_dict
+            else:
+                if log_line['mode'] == 'train':
+                    last_train_line_idx = i
+                    last_train_line = log_line
+
+                if log_line and log_line['mode'] == 'val':
+                    last_val_line_idx = i
+                    last_val_line = log_line
+
+    # bug: max_iters = 768, last_train_line['iter'] = 750
+    assert last_val_line_idx == last_train_line_idx + 1, \
+        'Log file is incomplete'
+    result_dict['memory'] = last_train_line['memory']
+    result_dict.update({
+        key: last_val_line[key]
+        for key in results_lut if key in last_val_line
+    })
+
     return result_dict
 
 
@@ -117,16 +150,6 @@ def get_dataset_name(config):
     return name_map[cfg.dataset_type]
 
 
-def find_last_dir(model_dir):
-    dst_times = []
-    for time_stamp in os.scandir(model_dir):
-        if osp.isdir(time_stamp):
-            dst_time = time.mktime(
-                time.strptime(time_stamp.name, '%Y%m%d_%H%M%S'))
-            dst_times.append([dst_time, time_stamp.name])
-    return max(dst_times, key=lambda x: x[0])[1]
-
-
 def convert_model_info_to_pwc(model_infos):
     pwc_files = {}
     for model in model_infos:
@@ -137,7 +160,9 @@ def convert_model_info_to_pwc(model_infos):
         pwc_model_info['Config'] = osp.join('configs', model['config'])
 
         # get metadata
+        memory = round(model['results']['memory'] / 1024, 1)
         meta_data = OrderedDict()
+        meta_data['Training Memory (GB)'] = memory
         if 'epochs' in model:
             meta_data['Epochs'] = get_real_epoch_or_iter(model['config'])
         else:
@@ -173,7 +198,7 @@ def convert_model_info_to_pwc(model_infos):
                     Metrics={'PQ': metric}))
         pwc_model_info['Results'] = results
 
-        link_string = 'https://download.openmmlab.com/mmdetection/v3.0/'
+        link_string = 'https://download.openmmlab.com/mmdetection/v2.0/'
         link_string += '{}/{}'.format(model['config'].rstrip('.py'),
                                       osp.split(model['model_path'])[-1])
         pwc_model_info['Weights'] = link_string
@@ -189,13 +214,9 @@ def parse_args():
     parser.add_argument(
         'root',
         type=str,
-        default='work_dirs',
         help='root path of benchmarked models to be gathered')
     parser.add_argument(
-        '--out',
-        type=str,
-        default='gather',
-        help='output path of gathered models to be stored')
+        'out', type=str, help='output path of gathered models to be stored')
     parser.add_argument(
         '--best',
         action='store_true',
@@ -241,22 +262,32 @@ def main():
             continue
 
         # get the latest logs
-        latest_exp_name = find_last_dir(exp_dir)
-        latest_exp_json = osp.join(exp_dir, latest_exp_name, 'vis_data',
-                                   latest_exp_name + '.json')
-
-        model_performance = get_final_results(
-            latest_exp_json, final_epoch_or_iter, by_epoch=by_epoch)
+        log_json_path = list(
+            sorted(glob.glob(osp.join(exp_dir, '*.log.json'))))[-1]
+        log_txt_path = list(sorted(glob.glob(osp.join(exp_dir, '*.log'))))[-1]
+        cfg = Config.fromfile('./configs/' + used_config)
+        results_lut = cfg.evaluation.metric
+        if not isinstance(results_lut, list):
+            results_lut = [results_lut]
+        # case when using VOC, the evaluation key is only 'mAP'
+        # when using Panoptic Dataset, the evaluation key is 'PQ'.
+        for i, key in enumerate(results_lut):
+            if 'mAP' not in key and 'PQ' not in key:
+                results_lut[i] = key + '_mAP'
+        model_performance = get_final_results(log_json_path,
+                                              final_epoch_or_iter, results_lut,
+                                              by_epoch)
 
         if model_performance is None:
             continue
 
+        model_time = osp.split(log_txt_path)[-1].split('.')[0]
         model_info = dict(
             config=used_config,
             results=model_performance,
+            model_time=model_time,
             final_model=final_model,
-            latest_exp_json=latest_exp_json,
-            latest_exp_name=latest_exp_name)
+            log_json_path=osp.split(log_json_path)[-1])
         model_info['epochs' if by_epoch else 'iterations'] =\
             final_epoch_or_iter
         model_infos.append(model_info)
@@ -269,7 +300,7 @@ def main():
 
         model_name = osp.split(model['config'])[-1].split('.')[0]
 
-        model_name += '_' + model['latest_exp_name']
+        model_name += '_' + model['model_time']
         publish_model_path = osp.join(model_publish_dir, model_name)
         trained_model_path = osp.join(models_root, model['config'],
                                       model['final_model'])
@@ -279,8 +310,13 @@ def main():
                                               publish_model_path)
 
         # copy log
-        shutil.copy(model['latest_exp_json'],
-                    osp.join(model_publish_dir, f'{model_name}.log.json'))
+        shutil.copy(
+            osp.join(models_root, model['config'], model['log_json_path']),
+            osp.join(model_publish_dir, f'{model_name}.log.json'))
+        shutil.copy(
+            osp.join(models_root, model['config'],
+                     model['log_json_path'].rstrip('.json')),
+            osp.join(model_publish_dir, f'{model_name}.log'))
 
         # copy config to guarantee reproducibility
         config_path = model['config']
